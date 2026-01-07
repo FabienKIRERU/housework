@@ -3,7 +3,7 @@ name: Mirror to Private GitLab
 on:
   push:
     branches:
-      - main  # Le miroir se déclenche uniquement quand vous modifiez la branche main
+      - main
   delete:
 
 jobs:
@@ -16,5 +16,5 @@ jobs:
 
       - name: Push to GitLab Server
         run: |
-          # Commande de push vers votre serveur spécifique
-          git push --mirror http://oauth2:${{ secrets.GITLAB_HOUSEWORK_TOKEN }}@72.61.180.240:9080/housework/housework-app.git
+          # Utilisation du chemin correct : homework/housework-app.git
+          git push --mirror http://oauth2:${{ secrets.GITLAB_HOUSEWORK_TOKEN }}@72.61.180.240:9080/homework/housework-app.git
