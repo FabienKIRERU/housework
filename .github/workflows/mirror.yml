@@ -17,4 +17,4 @@ jobs:
         run: |
           # On pousse uniquement la branche main locale vers la branche main de GitLab
           # L'option -f (force) permet d'écraser GitLab pour que les deux soient toujours identiques
-          git push http://oauth2:${{ secrets.GITLAB_TOKEN }}@72.61.180.240:9080/homework/housework-app.git main:main -f
+          git push http://oauth2:${{ secrets.GITLAB_HOUSEWORK_TOKEN }}@72.61.180.240:9080/homework/housework-app.git main:main -f
