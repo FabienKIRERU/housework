@@ -1,4 +1,4 @@
-image: edbizarro/gitlab-ci-pipeline-php:8.2
+image: php:8.2
 
 # Définition des étapes
 stages:
@@ -17,18 +17,25 @@ setup:
   tags:        
     - docker
   script:
-    - echo "🛠️ Installation des dépendances..."
-    # On installe les librairies système requises par Laravel (Zip, XML, etc.)
-    - apt-get update -y && apt-get install -y openssl zip unzip git libonig-dev libxml2-dev libsqlite3-dev
-    # On installe les extensions PHP
-    - docker-php-ext-install mbstring pdo pdo_mysql xml
-    # Installation de Composer
+    - echo "🛠️ Installation des dépendances optimisée..."
+    # 1. On installe juste git et unzip (très léger)
+    - apt-get update -y && apt-get install -y unzip git
+    
+    # 2. L'ASTUCE : On télécharge un script qui installe les extensions PHP en 2 secondes sans compiler
+    # Cela évite le crash mémoire sur ton VPS
+    - curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
+    - chmod +x /usr/local/bin/install-php-extensions
+    - install-php-extensions pdo pdo_mysql xml mbstring zip sqlite3
+
+    # 3. Installation de Composer
     - curl -sS https://getcomposer.org/installer | php
     - php composer.phar install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    
+    # 4. Config Laravel
     - cp .env.example .env
     - php artisan key:generate
+  
   artifacts:
-    # On transmet le dossier vendor et le .env à l'étape suivante
     paths:
       - vendor/
       - .env
@@ -51,3 +58,5 @@ unit_test:
   variables:
     DB_CONNECTION: sqlite
     DB_DATABASE: database/database.sqlite
+
+    
