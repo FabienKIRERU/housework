@@ -14,6 +14,8 @@ cache:
 # Étape 1 : Installation (Build)
 setup:
   stage: build
+  tags:        
+    - docker
   script:
     - echo "🛠️ Installation des dépendances..."
     # On installe les librairies système requises par Laravel (Zip, XML, etc.)
