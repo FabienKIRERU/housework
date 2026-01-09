@@ -1,24 +1,51 @@
+image: php:8.2
+
+# Définition des étapes
 stages:
-  - test_connexion
-  - test_docker
+  - build
+  - test
 
-# Test 1 : Vérifie que le Runner répond (Hello World)
-hello_world:
-  stage: test_connexion
-  image: alpine:latest
-  tags:
-    - docker  # Important : C'est le tag qu'on a donné à ton runner
+# Cache pour accélérer les prochaines exécutions
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/
+
+# Étape 1 : Installation (Build)
+setup:
+  stage: build
   script:
-    - echo "👋 Bonjour ! Si tu vois ça, c'est que le Runner est vivant."
-    - echo "Le mirroring GitHub vers GitLab a fonctionné."
+    - echo "🛠️ Installation des dépendances..."
+    # On installe les librairies système requises par Laravel (Zip, XML, etc.)
+    - apt-get update -y && apt-get install -y openssl zip unzip git libonig-dev libxml2-dev libsqlite3-dev
+    # On installe les extensions PHP
+    - docker-php-ext-install mbstring pdo pdo_mysql xml
+    # Installation de Composer
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - cp .env.example .env
+    - php artisan key:generate
+  artifacts:
+    # On transmet le dossier vendor et le .env à l'étape suivante
+    paths:
+      - vendor/
+      - .env
+    expire_in: 30 mins
 
-# Test 2 : Vérifie que le Runner peut piloter Docker (Socket)
-check_docker_socket:
-  stage: test_docker
-  image: docker:latest
+# Étape 2 : Tests (Test)
+unit_test:
+  stage: test
   tags:
     - docker
   script:
-    - echo "🐳 Vérification de l'accès à Docker..."
-    - docker info
-    - echo "Succès ! Le Runner peut créer des conteneurs."
+    - echo "🧪 Lancement des tests..."
+    # Création du fichier SQLite
+    - touch database/database.sqlite
+    # Migration de la base de données
+    - php artisan migrate --force
+    # Exécution des tests
+    - php artisan test
+  # ICI : On force Laravel à utiliser SQLite au lieu de MySQL
+  variables:
+    DB_CONNECTION: sqlite
+    DB_DATABASE: database/database.sqlite
