@@ -1,0 +1,24 @@
+stages:
+  - test_connexion
+  - test_docker
+
+# Test 1 : Vérifie que le Runner répond (Hello World)
+hello_world:
+  stage: test_connexion
+  image: alpine:latest
+  tags:
+    - docker  # Important : C'est le tag qu'on a donné à ton runner
+  script:
+    - echo "👋 Bonjour ! Si tu vois ça, c'est que le Runner est vivant."
+    - echo "Le mirroring GitHub vers GitLab a fonctionné."
+
+# Test 2 : Vérifie que le Runner peut piloter Docker (Socket)
+check_docker_socket:
+  stage: test_docker
+  image: docker:latest
+  tags:
+    - docker
+  script:
+    - echo "🐳 Vérification de l'accès à Docker..."
+    - docker info
+    - echo "Succès ! Le Runner peut créer des conteneurs."
