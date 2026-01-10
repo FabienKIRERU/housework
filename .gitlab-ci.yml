@@ -1,0 +1,62 @@
+image: php:8.4
+
+# Définition des étapes
+stages:
+  - build
+  - test
+
+# Cache pour accélérer les prochaines exécutions
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - vendor/
+
+# Étape 1 : Installation (Build)
+setup:
+  stage: build
+  tags:        
+    - docker
+  script:
+    - echo "🛠️ Installation des dépendances optimisée..."
+    # 1. On installe juste git et unzip (très léger)
+    - apt-get update -y && apt-get install -y unzip git
+    
+    # 2. L'ASTUCE : On télécharge un script qui installe les extensions PHP en 2 secondes sans compiler
+    # Cela évite le crash mémoire sur ton VPS
+    - curl -sSLf -o /usr/local/bin/install-php-extensions https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions
+    - chmod +x /usr/local/bin/install-php-extensions
+    - install-php-extensions pdo pdo_mysql xml mbstring zip sqlite3
+
+    # 3. Installation de Composer
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    
+    # 4. Config Laravel
+    - cp .env.example .env
+    - php artisan key:generate
+  
+  artifacts:
+    paths:
+      - vendor/
+      - .env
+    expire_in: 30 mins
+
+# Étape 2 : Tests (Test)
+unit_test:
+  stage: test
+  tags:
+    - docker
+  script:
+    - echo "🧪 Lancement des tests..."
+    # Création du fichier SQLite
+    - touch database/database.sqlite
+    # Migration de la base de données
+    - php artisan migrate --force
+    # Exécution des tests
+    - php artisan test
+  # ICI : On force Laravel à utiliser SQLite au lieu de MySQL
+  variables:
+    DB_CONNECTION: sqlite
+    DB_DATABASE: database/database.sqlite
+
+    
