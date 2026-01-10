@@ -25,7 +25,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2' # Ou 8.4 selon ton projet
+        php-version: '8.4' # Ou 8.2 selon ton projet
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, fileinfo
     
     - name: Copy .env
