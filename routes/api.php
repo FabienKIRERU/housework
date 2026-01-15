@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\HouseworkerController;
 
 
 
@@ -20,20 +21,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // --- ZONE ADMIN ---
-    // On pourrait ajouter un middleware supplémentaire 'can:isAdmin' plus tard
-    // Route::prefix('admin')->group(function () {
-        
-    //     // Réservations
-    //     Route::get('/reservations', [ReservationController::class, 'indexAdmin']);
-    //     Route::put('/reservations/{reservation}', [ReservationController::class, 'update']);
+    // Groupe ADMIN
+    Route::prefix('admin')->group(function () {        
+        // pour créer automatiquement GET, POST, GET/{id}, PUT/{id}, DELETE/{id}
+        Route::apiResource('houseworkers', HouseworkerController::class);
 
-    //     // Services
-    //     Route::post('/services', [ServiceController::class, 'store']);
-        
-    //     // Staff
-    //     Route::get('/houseworkers', [ReservationController::class, 'listHouseworkers']);
-    // });
+    });
+
+
 });
 
 
