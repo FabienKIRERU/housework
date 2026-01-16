@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\HouseworkerController;
 
 
@@ -25,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->group(function () {        
         // pour créer automatiquement GET, POST, GET/{id}, PUT/{id}, DELETE/{id}
         Route::apiResource('houseworkers', HouseworkerController::class);
+
+        Route::apiResource('services', ServiceController::class);
 
     });
 
