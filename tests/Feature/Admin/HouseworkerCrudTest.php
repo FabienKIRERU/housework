@@ -35,7 +35,7 @@ class HouseworkerCrudTest extends TestCase
 
         // 4. Verification de la réponse
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+                 ->assertJsonCount(3);
 
     }
 
@@ -54,7 +54,8 @@ class HouseworkerCrudTest extends TestCase
             'name' => $this->faker->name,
             'firstname' => $this->faker->firstName,
             'email' => $this->faker->unique()->safeEmail,
-            'password' => 'password123', // Assurez-vous que le mot de passe respecte les règles de validation
+            'phone' => '0123456789', // <-- Ajoutez cette ligne
+            'password' => 'password123',
             'role' => 'houseworker',
         ];
 
@@ -88,7 +89,7 @@ class HouseworkerCrudTest extends TestCase
         $response = $this->postJson('/api/admin/houseworkers', []);
 
         $response->assertStatus(422) // Erreur de validation
-                 ->assertJsonValidationErrors(['lastname', 'email', 'password']);
+                 ->assertJsonValidationErrors(['name', 'email', 'password']);
     }
 
 
