@@ -12,11 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('services', function (Blueprint $table) {
-            $table->id();
-
-            // Lien vers la catégorie
-            $table->foreignId('service_category_id')->constrained()->onDelete('cascade');
-            
+            $table->id();            
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 8, 2); // ex: 999999.99
