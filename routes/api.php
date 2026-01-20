@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\HouseworkerController;
 
@@ -10,6 +11,9 @@ use App\Http\Controllers\Admin\HouseworkerController;
 
 // Authentification
 Route::post('/login', [AuthController::class, 'login']);
+
+
+Route::post('/reservations', [ReservationController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
