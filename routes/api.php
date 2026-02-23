@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\HouseworkerController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 
 
 
@@ -32,6 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('houseworkers', HouseworkerController::class);
 
         Route::apiResource('services', ServiceController::class);
+
+
+        // GESTION RÉSERVATIONS (Admin)
+        Route::get('/reservations', [AdminReservationController::class, 'index']);
+        Route::put('/reservations/{reservation}', [AdminReservationController::class, 'update']);
 
     });
 

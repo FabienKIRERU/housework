@@ -86,4 +86,90 @@ class ReservationRepository implements ReservationRepositoryInterface
         ]);
         return $reservation;
     }
+
+    
+    /**
+     * ADMIN : Liste avec Filtres (Statut) et Recherche (Matricule)
+     */
+    public function getAdminReservations(array $filters = [])
+    {
+        $query = Reservation::with(['client', 'service', 'houseworker'])
+            ->orderBy('created_at', 'desc');
+
+        // 1. Filtre par Statut (ex: ?status=pending)
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // 2. Recherche par Matricule/Code (ex: ?search=KAB2026...)
+        if (!empty($filters['search'])) {
+            $query->where('code', 'like', '%' . $filters['search'] . '%');
+            // Optionnel : Tu pourrais aussi chercher par nom du client ici avec un orWhereHas...
+        }
+
+        // On retourne le résultat (on pourrait ajouter ->paginate(20) plus tard)
+        return $query->get();
+    }
+
+    
+    public function adminUpdateReservation($id, array $data)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        // On vérifie si la date d'intervention prévue est passée de plus de 72h.
+        $interventionDate = Carbon::parse($reservation->intervention_date);
+        $now = Carbon::now();
+
+        // Si la date est passée ET qu'il s'est écoulé plus de 72h
+        if ($interventionDate->isPast() && $interventionDate->diffInHours($now) > 72) {
+            throw new \Exception("Modification interdite : Cette réservation est archivée (date d'intervention passée de plus de 72h).", 403);
+        }
+
+
+         // Si l'admin essaie de changer la date, elle ne doit pas être dans le passé.
+        if (isset($data['intervention_date'])) {
+            $newDate = Carbon::parse($data['intervention_date']);
+            if ($newDate->isPast()) {
+                throw new \Exception("Erreur : Vous ne pouvez pas déplacer une intervention à une date passée.", 422);
+            }
+        }
+
+        // Si la réservation est déjà finie ou annulée, on ne touche plus à rien.
+        if (in_array($reservation->status, ['cancelled', 'completed'])) {
+            throw new \Exception("Impossible de modifier une réservation terminée ou annulée.", 400);
+        }
+
+
+        // On regarde quel sera le futur statut (soit celui envoyé, soit l'actuel)
+        $futureStatus = $data['status'] ?? $reservation->status;
+
+
+        // On regarde qui sera la future ménagère (soit celle envoyée, soit l'actuelle)
+        // Attention : on vérifie si la clé existe dans $data, car l'admin peut envoyer null pour retirer la ménagère
+        $futureHouseworkerId = array_key_exists('houseworker_id', $data) 
+                                ? $data['houseworker_id'] 
+                                : $reservation->houseworker_id;
+        
+        
+        // LE TEST FATIDIQUE :
+        // Si on veut être 'confirmed' ou 'completed', il FAUT une ménagère.
+        if (in_array($futureStatus, ['confirmed', 'completed']) && empty($futureHouseworkerId)) {
+            throw new \Exception("Action refusée : Impossible de confirmer ou terminer une réservation sans assigner une ménagère.", 422);
+        }
+
+
+
+        // LOGIQUE MÉTIER :
+        // Si on assigne une ménagère et que le statut est encore 'pending',
+        // on passe automatiquement à 'confirmed' pour gagner du temps.
+        if (isset($data['houseworker_id']) && $data['houseworker_id'] != null && $reservation->status === 'pending') {
+            $data['status'] = 'confirmed';
+        }
+
+        // Mise à jour des données
+        $reservation->update($data);
+
+        // On retourne l'objet rafraîchi avec ses relations (pour que le Frontend React mette à jour l'affichage)
+        return $reservation->load(['houseworker', 'client', 'service']);
+    }
 }
