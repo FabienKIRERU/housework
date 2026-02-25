@@ -27,7 +27,14 @@
 
         <div class="details">
             <h3>Détails de l'intervention :</h3>
-            <p><strong>Service :</strong> {{ $reservation->service->name }}</p>
+            <p>                
+                <p><strong>Services commandés :</strong></p>
+                <ul>
+                    @foreach($reservation->services as $service)
+                        <li>{{ $service->name }} ({{ $service->pivot->price_at_booking }} $)</li>
+                    @endforeach
+                </ul>            
+            </p>
             <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($reservation->intervention_date)->format('d/m/Y à H:i') }}</p>
             <p><strong>Adresse :</strong> {{ $reservation->address }}</p>
             <p><strong>Statut :</strong> <span style="color: orange;">En attente de validation</span></p>

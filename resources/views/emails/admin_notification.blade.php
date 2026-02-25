@@ -15,7 +15,15 @@
     <div class="box">
         <h3>Détails de la mission :</h3>
         <ul>
-            <li><strong>Service :</strong> {{ $reservation->service->name }}</li>
+            <li>
+                <p><strong>Services commandés :</strong></p>
+                <ul>
+                    @foreach($reservation->services as $service)
+                        <li>{{ $service->name }} ({{ $service->pivot->price_at_booking }} $)</li>
+                    @endforeach
+                </ul>
+                <p><strong>Prix Total :</strong> {{ $reservation->total_price }} $</p>
+            </li>
             <li><strong>Date :</strong> {{ \Carbon\Carbon::parse($reservation->intervention_date)->format('d/m/Y à H:i') }}</li>
             <li><strong>Lieu :</strong> {{ $reservation->address }}</li>
             <li><strong>Code Résa :</strong> <span class="highlight">{{ $reservation->code }}</span></li>

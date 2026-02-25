@@ -23,8 +23,14 @@ class HouseworkerAssignedMail extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
+        // 1. On récupère juste la colonne 'name' de tous les services
+        // 2. On les colle avec une virgule et un espace
+        $serviceNames = $this->reservation->services->pluck('name')->implode(', ');
+
         return new Envelope(
-            subject: '🧹 Nouvelle mission assignée : ' . $this->reservation->service->name,
+            // On limite la taille à 50 caractères pour éviter un objet de mail kilomètrique
+            // si le client a pris 10 services.
+            subject: '🧹 Nouvelle mission : ' . \Illuminate\Support\Str::limit($serviceNames, 50),
         );
     }
 
