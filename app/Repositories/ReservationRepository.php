@@ -3,20 +3,21 @@
 namespace App\Repositories;
 
 
-use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Reservation;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
+use App\Models\Service;
 use App\Repositories\Contracts\ReservationRepositoryInterface;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ReservationRepository implements ReservationRepositoryInterface
 {
-    // On passe toutes les données (client + résa) d'un coup
     public function createReservationFromClient(array $data)
     {
         return DB::transaction(function () use ($data) {
-            // Création du client
+
+            // 1. Création client
             $client = Client::create([
                 'name' => $data['client_name'],
                 'firstname' => $data['client_firstname'],
@@ -24,20 +25,34 @@ class ReservationRepository implements ReservationRepositoryInterface
                 'phone' => $data['client_phone'],
             ]);
 
-
-            // Génération du Code Unique
+            // 2. Code unique
             $code = $this->generateReservationCode($data['client_name']);
 
-            // Création de la réservation liée au client
-            return Reservation::create([
+            // 3. Services
+            $services = Service::whereIn('id', $data['service_ids'])->get();
+            $totalPrice = $services->sum('price');
+
+            // 4. Création réservation
+            $reservation = Reservation::create([
                 'code' => $code,
                 'client_id' => $client->id,
-                'service_id' => $data['service_id'],
+                'total_price' => $totalPrice,
                 'intervention_date' => $data['intervention_date'],
                 'address' => $data['address'],
-                'status' => 'pending', // statut par défaut
+                'status' => 'pending',
             ]);
 
+            // 5. Pivot
+            $pivotData = [];
+            foreach ($services as $service) {
+                $pivotData[$service->id] = [
+                    'price_at_booking' => $service->price
+                ];
+            }
+
+            $reservation->services()->attach($pivotData);
+
+            return $reservation;
         });
     }
 
@@ -59,7 +74,7 @@ class ReservationRepository implements ReservationRepositoryInterface
             })
             // ON CHARGE LES INFOS COMPLÈTES
             ->with([
-                'service',       // Le détail du service
+                'services',       // Le détail du service
                 'client',        // Le détail du client
                 // Sécurité : On ne donne que le Prénom et Nom de la ménagère, pas son email/mdp
                 'houseworker:id,firstname,name,phone' 

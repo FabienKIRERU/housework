@@ -27,7 +27,7 @@ class ReservationController extends Controller
         // 2. ENVOI DES EMAILS 📧
         try {
             // On charge les relations pour les vues
-            $reservation->load(['client', 'service']);
+            $reservation->load(['client', 'services']);
             
             // A. Email Client
             Mail::to($reservation->client->email)
@@ -43,9 +43,12 @@ class ReservationController extends Controller
         } catch (\Exception $e) {
             // Log::error("Erreur d'envoi mail : " . $e->getMessage());
         }
+
+        // On récupère les noms des services et on les colle avec une virgule
+        $serviceNames = $reservation->services->pluck('name')->implode(', ');
         
         return response()->json([
-            'message' => 'Réservation du service ' . $reservation->service->name . ' reçue avec succès !',
+            'message' => 'Réservation des services ' . $serviceNames . ' reçue avec succès !',
             'code' => $reservation->code, // On renvoie le code au client
             'reservation' => $reservation
         ], 201);
