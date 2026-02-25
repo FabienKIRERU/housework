@@ -15,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::post('/reservations', [ReservationController::class, 'store']);
+Route::post('/reservations/track', [ReservationController::class, 'track']);
 
 /*
 |--------------------------------------------------------------------------
