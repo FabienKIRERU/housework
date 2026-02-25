@@ -14,4 +14,10 @@ class Service extends Model
         'name', 'description', 'price', 'is_active'
     ];
 
+    public function reservations(){
+        return $this->belongsToMany(Reservation::class, 'reservation_service')
+                    ->withPivot('price_at_booking')
+                    ->withTimestamps();
+    }
+
 }

@@ -20,8 +20,12 @@
             {{ \Carbon\Carbon::parse($reservation->intervention_date)->format('d/m/Y à H:i') }}
         </p>
         <p>
-            <span class="info-label">Service :</span><br>
-            {{ $reservation->service->name }}
+            <p><strong>Services commandés :</strong></p>
+            <ul>
+                @foreach($reservation->services as $service)
+                    <li>{{ $service->name }} ({{ $service->pivot->price_at_booking }} $)</li>
+                @endforeach
+            </ul>
         </p>
         <p>
             <span class="info-label">Lieu :</span><br>
