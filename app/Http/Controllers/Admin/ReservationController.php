@@ -74,4 +74,5 @@ class ReservationController extends Controller
             ], $e->getCode() ?: 400);
         }
     }
+
 }

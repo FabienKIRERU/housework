@@ -41,6 +41,32 @@ class ReservationRepository implements ReservationRepositoryInterface
         });
     }
 
+    /**
+     * Recherche flexible pour le client (Code + Email/Tel/Nom)
+     */
+    public function findClientReservation(string $code, ?string $email = null, ?string $phone = null, ?string $name = null){
+        return Reservation::where('code', $code)
+            ->whereHas('client', function ($query) use ($email, $phone) {
+                // On regroupe les conditions dans un "AND ( ... OR ... OR ... )"
+                $query->where(function ($q) use ($email, $phone) {
+                    if ($email) {
+                        $q->orWhere('email', $email);
+                    }
+                    if ($phone) {
+                        $q->orWhere('phone', $phone);
+                    }
+                });
+            })
+            // ON CHARGE LES INFOS COMPLÈTES
+            ->with([
+                'service',       // Le détail du service
+                'client',        // Le détail du client
+                // Sécurité : On ne donne que le Prénom et Nom de la ménagère, pas son email/mdp
+                'houseworker:id,firstname,name,phone' 
+            ])
+            ->first();
+    }
+
     private function generateReservationCode(string $name) : string 
     {
         // 3 premières lettres du nom en majuscule (ex: DUP)
