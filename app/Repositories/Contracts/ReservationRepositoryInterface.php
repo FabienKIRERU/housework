@@ -9,6 +9,9 @@ interface ReservationRepositoryInterface
     // On passe toutes les données (client + résa) d'un coup
     public function createReservationFromClient(array $data);
 
+    // Remplace "findByCodeAndEmail" par :
+    public function findClientReservation(string $code, ?string $email = null, ?string $phone = null);
+
 
     public function getAllReservations();
     public function updateStatus($id, $status);
