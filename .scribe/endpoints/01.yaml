@@ -92,7 +92,7 @@ endpoints:
         name: status
         description: ''
         required: false
-        example: confirmed
+        example: cancelled
         type: string
         enumValues:
           - pending
@@ -107,7 +107,7 @@ endpoints:
         name: intervention_date
         description: 'Must be a valid date.'
         required: false
-        example: '2026-02-25T17:39:50'
+        example: '2026-02-26T18:26:45'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -125,9 +125,76 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      status: confirmed
-      intervention_date: '2026-02-25T17:39:50'
+      status: cancelled
+      intervention_date: '2026-02-26T18:26:45'
       address: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/admin/reservations/{reservation}/assign'
+    metadata:
+      custom: []
+      groupName: 'Gestion Réservations (Admin)'
+      groupDescription: 'Traitement des demandes : Assignation, confirmation, annulation.'
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Assigner une ménagère à une tâche spécifique'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      reservation:
+        custom: []
+        name: reservation
+        description: 'The reservation.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      reservation: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      service_id:
+        custom: []
+        name: service_id
+        description: 'The <code>id</code> of an existing record in the services table.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      houseworker_id:
+        custom: []
+        name: houseworker_id
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      service_id: architecto
+      houseworker_id: architecto
     fileParameters: []
     responses: []
     responseFields: []
