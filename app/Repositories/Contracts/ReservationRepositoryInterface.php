@@ -21,4 +21,6 @@ interface ReservationRepositoryInterface
     public function getAdminReservations(array $filters = []);
     // Modifier une réservation (Assignation ou Changement de statut)
     public function adminUpdateReservation($id, array $data);
+
+    public function assignHouseworkerToTask($reservationId, $serviceId, $houseworkerId);
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AssignTaskRequest;
 use App\Http\Requests\Admin\UpdateReservationRequest;
 use App\Repositories\Contracts\ReservationRepositoryInterface;
 use Illuminate\Http\Request;
@@ -73,6 +74,36 @@ class ReservationController extends Controller
                 'message' => $e->getMessage()
             ], $e->getCode() ?: 400);
         }
+    }
+
+    /**
+     * Assigner une ménagère à une tâche spécifique
+     */
+    public function assignTask(AssignTaskRequest $request, $id)
+    {
+        // 1. Assignation via Repository
+        $reservation = $this->reservationRepository->assignHouseworkerToTask(
+            $id,
+            $request->service_id,
+            $request->houseworker_id
+        );
+
+        // 2. Récupérer la ménagère et le service pour l'email
+        $houseworker = \App\Models\User::find($request->houseworker_id);
+        $service = \App\Models\Service::find($request->service_id);
+
+        // 3. Envoi de l'email à la ménagère concernée 📧
+        try {
+            // On crée un Mailable spécifique ou on adapte l'ancien
+            // (Il faut passer le service spécifique au Mailable maintenant)
+             \Illuminate\Support\Facades\Mail::to($houseworker->email)
+                 ->send(new \App\Mail\HouseworkerAssignedMail($reservation, $service));
+        } catch (\Exception $e) {}
+
+        return response()->json([
+            'message' => 'Ménagère assignée à la tâche avec succès.',
+            'reservation' => $reservation
+        ]);
     }
 
 }

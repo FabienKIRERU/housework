@@ -26,7 +26,7 @@ class Reservation extends Model
     public function services()
     {
         return $this->belongsToMany(Service::class, 'reservation_service')
-                    ->withPivot('price_at_booking') // On veut accéder au prix figé
+                    ->withPivot('price_at_booking', 'houseworker_id', 'status') // On veut accéder au prix figé
                     ->withTimestamps();
     }
 
