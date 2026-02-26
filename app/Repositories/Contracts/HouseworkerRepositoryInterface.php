@@ -9,4 +9,5 @@ interface HouseworkerRepositoryInterface
     public function createHouseworker(array $details);
     public function updateHouseworker($id, array $newDetails);
     public function deleteHouseworker($id);
+    public function getHouseworkersWithPlanning();
 }
