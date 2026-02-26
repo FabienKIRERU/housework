@@ -29,7 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     // Groupe ADMIN
-    Route::prefix('admin')->group(function () {        
+    Route::prefix('admin')->group(function () {
+        
+        Route::get('/houseworkers/planning', [HouseworkerController::class, 'planning']);
         // pour créer automatiquement GET, POST, GET/{id}, PUT/{id}, DELETE/{id}
         Route::apiResource('houseworkers', HouseworkerController::class);
 
@@ -39,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // GESTION RÉSERVATIONS (Admin)
         Route::get('/reservations', [AdminReservationController::class, 'index']);
         Route::put('/reservations/{reservation}', [AdminReservationController::class, 'update']);
-    Route::post('/reservations/{reservation}/assign', [AdminReservationController::class, 'assignTask']);
+        Route::post('/reservations/{reservation}/assign', [AdminReservationController::class, 'assignTask']);
 
     });
 
