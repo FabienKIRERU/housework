@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // GESTION RÉSERVATIONS (Admin)
         Route::get('/reservations', [AdminReservationController::class, 'index']);
         Route::put('/reservations/{reservation}', [AdminReservationController::class, 'update']);
+    Route::post('/reservations/{reservation}/assign', [AdminReservationController::class, 'assignTask']);
 
     });
 

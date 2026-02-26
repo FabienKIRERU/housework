@@ -128,13 +128,35 @@ class ReservationRepository implements ReservationRepositoryInterface
         return $reservation;
     }
 
-    
+    /**
+     * Assigner une ménagère à une TÂCHE précise d'une réservation
+     */
+    public function assignHouseworkerToTask($reservationId, $serviceId, $houseworkerId)
+    {
+        $reservation = Reservation::findOrFail($reservationId);
+
+        // 1. On met à jour la ligne spécifique dans la table pivot
+        // updateExistingPivot(id_du_service, [données à changer])
+        $reservation->services()->updateExistingPivot($serviceId, [
+            'houseworker_id' => $houseworkerId,
+            'status' => 'assigned'
+        ]);
+
+        // 2. Logique Statut Global (Optionnelle)
+        // Si au moins une tâche est assignée, la réservation globale passe à "confirmed"
+        if ($reservation->status === 'pending') {
+            $reservation->update(['status' => 'confirmed']);
+        }
+
+        return $reservation->load(['services', 'client']);
+    }
+
     /**
      * ADMIN : Liste avec Filtres (Statut) et Recherche (Matricule)
      */
     public function getAdminReservations(array $filters = [])
     {
-        $query = Reservation::with(['client', 'service', 'houseworker'])
+        $query = Reservation::with(['client', 'services'])
             ->orderBy('created_at', 'desc');
 
         // 1. Filtre par Statut (ex: ?status=pending)

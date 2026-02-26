@@ -56,4 +56,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Missions du ménager
+    public function tasks()
+    {
+        return $this->belongsToMany(Reservation::class, 'reservation_service')
+                    ->withPivot(['service_id', 'status', 'price_at_booking']);
+    }
 }
