@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: 'Laravel API Documentation'
+  title: 'Housework API Documentation'
   description: ''
   version: 1.0.0
 servers:
@@ -10,6 +10,9 @@ tags:
   -
     name: Endpoints
     description: ''
+  -
+    name: 'Gestion Réservations (Admin)'
+    description: 'Traitement des demandes : Assignation, confirmation, annulation.'
 paths:
   /api/login:
     post:
@@ -38,6 +41,93 @@ paths:
               required:
                 - email
                 - password
+      security: []
+  /api/reservations:
+    post:
+      summary: ''
+      operationId: postApiReservations
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the services table.'
+                  example: null
+                  items:
+                    type: string
+                intervention_date:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-03-21'
+                address:
+                  type: string
+                  description: 'Must be at least 5 characters.'
+                  example: ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqldzsnrwtujwvlxjklqppwqbewtnnoqitpxntlt
+                client_name:
+                  type: string
+                  description: 'Must be at least 2 characters.'
+                  example: cvip
+                client_firstname:
+                  type: string
+                  description: 'Must be at least 2 characters.'
+                  example: ojsa
+                client_email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: little.art@example.net
+                client_phone:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: glrbchgsrzyhcttwbkmkftmgos
+              required:
+                - intervention_date
+                - address
+                - client_name
+                - client_firstname
+                - client_email
+                - client_phone
+      security: []
+  /api/reservations/track:
+    post:
+      summary: ''
+      operationId: postApiReservationsTrack
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: ''
+                  example: architecto
+                email:
+                  type: string
+                  description: 'This field is required when none of <code>phone</code> are present. Must be a valid email address.'
+                  example: zbailey@example.net
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'This field is required when none of <code>email</code> are present.'
+                  example: architecto
+                  nullable: true
+              required:
+                - code
       security: []
   /api/logout:
     post:
@@ -212,6 +302,137 @@ paths:
         required: true
         schema:
           type: string
+  /api/admin/services:
+    get:
+      summary: ''
+      operationId: getApiAdminServices
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiAdminServices
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: ''
+                  example: 'Eius et animi quos velit et.'
+                  nullable: true
+                price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 60
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - name
+                - price
+      security: []
+  '/api/admin/services/{id}':
+    get:
+      summary: ''
+      operationId: getApiAdminServicesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiAdminServicesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: ''
+                  example: 'Eius et animi quos velit et.'
+                  nullable: true
+                price:
+                  type: number
+                  description: 'Must be at least 0.'
+                  example: 60
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiAdminServicesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the service.'
+        example: architecto
+        required: true
+        schema:
+          type: string
   /api/user:
     get:
       summary: ''
@@ -234,3 +455,73 @@ paths:
       tags:
         - Endpoints
       security: []
+  /api/admin/reservations:
+    get:
+      summary: 'Voir toutes les réservations (avec filtres)'
+      operationId: voirToutesLesRservationsavecFiltres
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Gestion Réservations (Admin)'
+      security: []
+  '/api/admin/reservations/{reservation}':
+    put:
+      summary: 'Traiter une réservation'
+      operationId: traiterUneRservation
+      description: "Permet d'assigner une ménagère (ce qui confirme la résa) ou de changer le statut (terminée/annulée)."
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Gestion Réservations (Admin)'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                houseworker_id:
+                  type: string
+                  description: ''
+                  example: null
+                  nullable: true
+                status:
+                  type: string
+                  description: ''
+                  example: confirmed
+                  enum:
+                    - pending
+                    - confirmed
+                    - completed
+                    - cancelled
+                intervention_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-02-25T17:39:50'
+                address:
+                  type: string
+                  description: ''
+                  example: architecto
+      security: []
+    parameters:
+      -
+        in: path
+        name: reservation
+        description: 'The reservation.'
+        example: architecto
+        required: true
+        schema:
+          type: string
