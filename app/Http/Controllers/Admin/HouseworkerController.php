@@ -56,4 +56,13 @@ class HouseworkerController extends Controller
         $this->houseworkerRepository->deleteHouseworker($id);
         return response()->json(['message' => 'Menager(ère) supprimé(e) avec succes']);
     }
+
+    /**
+     * Voir le planning des équipes
+     */
+    public function planning()
+    {
+        $houseworkers = $this->houseworkerRepository->getHouseworkersWithPlanning();
+        return response()->json($houseworkers);
+    }
 }

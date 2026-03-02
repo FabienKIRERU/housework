@@ -23,7 +23,10 @@ class StoreReservationRequest extends FormRequest
     {
         return [
             // Infos Réservation
-            'service_id' => 'required|exists:services,id',
+            // On accepte un tableau d'IDs
+            'service_ids' => 'required|array|min:1',
+            'service_ids.*' => 'exists:services,id',
+            
             'intervention_date' => 'required|date|after:now',
             'address' => 'required|string|min:5',
             

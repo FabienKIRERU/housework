@@ -12,8 +12,8 @@ class Reservation extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'client_id', 'code', 'service_id', 'houseworker_id', 
-        'intervention_date', 'address', 'status'
+        'client_id', 'code', 'houseworker_id', 
+        'intervention_date', 'address', 'status', 'total_price'
     ];
 
     // Le client qui a commandé
@@ -22,10 +22,12 @@ class Reservation extends Model
         return $this->belongsTo(Client::class);
     }
 
-    // Le service commandé
-    public function service()
+    // Relation Many-to-Many
+    public function services()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsToMany(Service::class, 'reservation_service')
+                    ->withPivot('price_at_booking', 'houseworker_id', 'status') // On veut accéder au prix figé
+                    ->withTimestamps();
     }
 
     // La ménagère assignée
