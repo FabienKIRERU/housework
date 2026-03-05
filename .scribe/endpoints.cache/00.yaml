@@ -97,7 +97,7 @@ endpoints:
         name: intervention_date
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: true
-        example: '2052-03-21'
+        example: '2052-03-22'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -159,7 +159,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      intervention_date: '2052-03-21'
+      intervention_date: '2052-03-22'
       address: ngzmiyvdljnikhwaykcmyuwpwlvqwrsitcpscqldzsnrwtujwvlxjklqppwqbewtnnoqitpxntlt
       client_name: cvip
       client_firstname: ojsa
@@ -885,7 +885,7 @@ endpoints:
         name: is_active
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -895,7 +895,7 @@ endpoints:
       name: b
       description: 'Eius et animi quos velit et.'
       price: 60
-      is_active: false
+      is_active: true
     fileParameters: []
     responses: []
     responseFields: []
